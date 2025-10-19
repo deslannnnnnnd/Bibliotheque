@@ -10,9 +10,9 @@ import Bibliotheque_DAEK.Model.Reservation;
 
 public interface ReservationRepository extends JpaRepository<Reservation,Long>{
 
-    List<Reservation>findByUserId(Long userId);
-    List<Reservation>findBookId(Long bookId);
-    List<Reservation>fingByStatut(Long statut);
-    List<Reservation>findByDateRetourPrevueBefore(LocalDate date);
-     Optional<Reservation> findByBookIdAndStatut(Long bookId, String statut);
+    List<Reservation> findByUserId(String userId);
+    List<Reservation> findByBookId(String bookId);
+    List<Reservation> findByStatus(String status);
+    List<Reservation> findByDateExpirationBefore(LocalDate date);
+    Optional<Reservation> findByBookIdAndStatus(String bookId, String status);
 }

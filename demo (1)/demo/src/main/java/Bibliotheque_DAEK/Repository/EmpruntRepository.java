@@ -10,11 +10,11 @@ import Bibliotheque_DAEK.Model.Emprunt;
 
 public interface EmpruntRepository extends JpaRepository<Emprunt ,Long>{
 
-List<Emprunt> findByUserId(Long userId);
-List<Emprunt> findByBookId(Long bookId);
-List<Emprunt> findBystatut(String statut);
+List<Emprunt> findByUserId(String userId);
+List<Emprunt> findByBookId(String bookId);
+List<Emprunt> findByStatut(String statut);
 List<Emprunt> findByDateRetourPrevueBefore(LocalDate date);
-Optional<Emprunt> findByBookIdAndStatut(Long bookId, String statut);
+Optional<Emprunt> findByBookIdAndStatut(String bookId, String statut);
 
 }
 

@@ -20,6 +20,12 @@ public class Book {
    private String type ; 
    private String statutDisponibilite;
    private Date dateAjout ;
+   // New fields
+   private Date publicationDate;
+   private Integer pages;
+   private String coverImageUrl;
+   private String publisher;
+   private String language;
    public Long getId() {
     return id;
    }
@@ -68,6 +74,46 @@ public class Book {
    public void setDateAjout(Date dateAjout) {
     this.dateAjout = dateAjout;
    } 
+
+   public Date getPublicationDate() {
+    return publicationDate;
+   }
+
+   public void setPublicationDate(Date publicationDate) {
+    this.publicationDate = publicationDate;
+   }
+
+   public Integer getPages() {
+    return pages;
+   }
+
+   public void setPages(Integer pages) {
+    this.pages = pages;
+   }
+
+   public String getCoverImageUrl() {
+    return coverImageUrl;
+   }
+
+   public void setCoverImageUrl(String coverImageUrl) {
+    this.coverImageUrl = coverImageUrl;
+   }
+
+   public String getPublisher() {
+    return publisher;
+   }
+
+   public void setPublisher(String publisher) {
+    this.publisher = publisher;
+   }
+
+   public String getLanguage() {
+    return language;
+   }
+
+   public void setLanguage(String language) {
+    this.language = language;
+   }
 
 
    
