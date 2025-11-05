@@ -27,7 +27,9 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Créer l'admin prédéfini si il n'existe pas
+
+        //   admin prédéfini si il n'existe pas
+
         if (!userRepository.existsByCodeAdmin("Admin1234")) {
             User admin = new User();
             admin.setCodeAdmin("Admin1234");
@@ -37,7 +39,8 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("Admin créé");
         }
 
-        // Créer le bibliothécaire prédéfini si il n'existe pas
+        //  bibliothécaire prédéfini si il n'existe pas
+        
         if (!userRepository.existsByNumeroEmploye("empl1234")) {
             User employee = new User();
             employee.setNumeroEmploye("empl1234");

@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-// ...existing code...
 import Bibliotheque_DAEK.Model.User;
 import Bibliotheque_DAEK.service.AuthService;
 

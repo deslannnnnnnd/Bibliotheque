@@ -26,6 +26,10 @@ public class Book {
    private String coverImageUrl;
    private String publisher;
    private String language;
+   
+   // Gestion des copies
+   private Integer nombreCopiesTotal = 5; // Nombre total de copies (par défaut 5)
+   private Integer copiesDisponibles = 5; // Copies actuellement disponibles
    public Long getId() {
     return id;
    }
@@ -115,7 +119,46 @@ public class Book {
     this.language = language;
    }
 
+   public Integer getNombreCopiesTotal() {
+    return nombreCopiesTotal;
+   }
 
-   
+   public void setNombreCopiesTotal(Integer nombreCopiesTotal) {
+    this.nombreCopiesTotal = nombreCopiesTotal;
+   }
 
+   public Integer getCopiesDisponibles() {
+    return copiesDisponibles;
+   }
+
+   public void setCopiesDisponibles(Integer copiesDisponibles) {
+    this.copiesDisponibles = copiesDisponibles;
+   }
+
+   // Méthodes utilitaires
+   public boolean aDesCopiesdisponibles() {
+    return copiesDisponibles != null && copiesDisponibles > 0;
+   }
+
+   public void emprunterUneCopie() {
+    if (copiesDisponibles != null && copiesDisponibles > 0) {
+        copiesDisponibles--;
+        updateStatut();
+    }
+   }
+
+   public void retournerUneCopie() {
+    if (copiesDisponibles != null && nombreCopiesTotal != null && copiesDisponibles < nombreCopiesTotal) {
+        copiesDisponibles++;
+        updateStatut();
+    }
+   }
+
+   private void updateStatut() {
+    if (copiesDisponibles == 0) {
+        this.statutDisponibilite = "emprunté";
+    } else {
+        this.statutDisponibilite = "disponible";
+    }
+   }
 }

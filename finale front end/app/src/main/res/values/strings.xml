@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Bibliothèque</string>
+    <string name="role_membre">👤 Membre</string>
+    <string name="role_bibliothecaire">📘 Bibliothécaire</string>
+    <string name="role_admin">⚙ Administrateur</string>
+    <string name="nom_complet">Nom complet</string>
+    <string name="hint_nom_complet">Votre nom complet</string>
+</resources>

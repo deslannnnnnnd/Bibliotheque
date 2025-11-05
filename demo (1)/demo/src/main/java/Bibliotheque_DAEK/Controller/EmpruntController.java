@@ -1,7 +1,7 @@
 package Bibliotheque_DAEK.Controller;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,90 +9,116 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import Bibliotheque_DAEK.Model.Emprunt;
-import Bibliotheque_DAEK.Repository.EmpruntRepository;
+import Bibliotheque_DAEK.service.LoanService;
 
 @RestController
-@RequestMapping("/api/emprunts")
+@RequestMapping("/api/loans")
 @CrossOrigin(origins = "*")
 public class EmpruntController {
 
     @Autowired
-    private EmpruntRepository empruntRepository;
+    private LoanService loanService;
 
-    // Récupérer tous les emprunts
+    /**
+     * BE-CON-02 : Récupérer tous les emprunts (bibliothécaire)
+     */
     @GetMapping
     public ResponseEntity<List<Emprunt>> getAllEmprunts() {
         try {
-            List<Emprunt> emprunts = empruntRepository.findAll();
-            if (emprunts.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-            return new ResponseEntity<>(emprunts, HttpStatus.OK);
+            List<Emprunt> emprunts = loanService.getAllEmprunts();
+            return ResponseEntity.ok(emprunts);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    // Récupérer un emprunt par ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Emprunt> getEmpruntById(@PathVariable("id") Long id) {
-        Optional<Emprunt> empruntData = empruntRepository.findById(id);
-        if (empruntData.isPresent()) {
-            return new ResponseEntity<>(empruntData.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    /**
+     * BE-CON-01 : Récupérer les emprunts d'un utilisateur
+     */
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Emprunt>> getEmpruntsByUser(@PathVariable Long userId) {
+        try {
+            List<Emprunt> emprunts = loanService.getEmpruntsByUser(userId);
+            return ResponseEntity.ok(emprunts);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
-    // Créer un nouvel emprunt
+    /**
+     * BE-CON-03 : Filtrer les emprunts par statut
+     */
+    @GetMapping("/statut/{statut}")
+    public ResponseEntity<List<Emprunt>> getEmpruntsByStatut(@PathVariable String statut) {
+        try {
+            List<Emprunt> emprunts = loanService.getEmpruntsByStatut(statut);
+            return ResponseEntity.ok(emprunts);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Récupérer les emprunts en retard
+     */
+    @GetMapping("/retard")
+    public ResponseEntity<List<Emprunt>> getEmpruntsEnRetard() {
+        try {
+            List<Emprunt> emprunts = loanService.getEmpruntsEnRetard();
+            return ResponseEntity.ok(emprunts);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * BE-EMP-01 : Emprunter un livre
+     * POST /api/loans
+     * Body: { "userId": 1, "bookId": 5 }
+     */
     @PostMapping
-    public ResponseEntity<Emprunt> createEmprunt(@RequestBody Emprunt emprunt) {
+    public ResponseEntity<?> emprunterLivre(@RequestBody Map<String, Long> request) {
         try {
-            Emprunt newEmprunt = empruntRepository.save(emprunt);
-            return new ResponseEntity<>(newEmprunt, HttpStatus.CREATED);
+            Long userId = request.get("userId");
+            Long bookId = request.get("bookId");
+            Emprunt emprunt = loanService.emprunterLivre(userId, bookId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(emprunt);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Erreur serveur"));
         }
     }
 
-    // Mettre à jour un emprunt
-    @PutMapping("/{id}")
-    public ResponseEntity<Emprunt> updateEmprunt(@PathVariable("id") Long id, @RequestBody Emprunt emprunt) {
-        Optional<Emprunt> empruntData = empruntRepository.findById(id);
-        if (empruntData.isPresent()) {
-            Emprunt existingEmprunt = empruntData.get();
-            existingEmprunt.setUserId(emprunt.getUserId());
-            existingEmprunt.setBookId(emprunt.getBookId());
-            existingEmprunt.setDateEmprunt(emprunt.getDateEmprunt());
-            existingEmprunt.setDateRetourPrevue(emprunt.getDateRetourPrevue());
-            existingEmprunt.setDateRetourEffective(emprunt.getDateRetourEffective());
-            existingEmprunt.setStatut(emprunt.getStatut());
-            existingEmprunt.setAmende(emprunt.getAmende());
-            return new ResponseEntity<>(empruntRepository.save(existingEmprunt), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    /**
+     * BE-PRO-01 : Prolonger un emprunt
+     * PUT /api/loans/{id}/extend
+     */
+    @PutMapping("/{id}/extend")
+    public ResponseEntity<?> prolongerEmprunt(@PathVariable Long id) {
+        try {
+            Emprunt emprunt = loanService.prolongerEmprunt(id);
+            return ResponseEntity.ok(emprunt);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Erreur serveur"));
         }
     }
 
-    // Supprimer un emprunt
-    @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteEmprunt(@PathVariable("id") Long id) {
+    /**
+     * BE-RET-01 : Retourner un livre
+     * PUT /api/loans/{id}/return
+     */
+    @PutMapping("/{id}/return")
+    public ResponseEntity<?> retournerLivre(@PathVariable Long id) {
         try {
-            empruntRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            Emprunt emprunt = loanService.retournerLivre(id);
+            return ResponseEntity.ok(emprunt);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    // Supprimer tous les emprunts
-    @DeleteMapping
-    public ResponseEntity<HttpStatus> deleteAllEmprunts() {
-        try {
-            empruntRepository.deleteAll();
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Erreur serveur"));
         }
     }
 }
